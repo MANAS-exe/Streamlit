@@ -4,7 +4,6 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from streamlit_option_menu import option_menu
 from skorch import NeuralNetClassifier
 from sklearn.metrics import accuracy_score
 import torch
