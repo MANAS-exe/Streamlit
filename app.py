@@ -68,7 +68,7 @@ def home_page():
     st.title("Home Page")
     st.write("This is an app based on the classification of digits based on MNIST data.")
     st.write('The MNIST dataset is a collection of 28 x 28 pixel grayscale images of handwritten digits (0 through 9). It is a widely used dataset in machine learning and computer vision for training and testing various image processing systems. The name "MNIST" stands for Modified National Institute of Standards and Technology.')
-    image = Image.open('https://github.com/MANAS-exe/Streamlit/blob/main/mnist.webp')
+    image = Image.open('mnist.webp')
     st.image(image , caption='This is the dataset which you will train ')
 
     st.header('Now what is Machine Learning ?')
@@ -78,7 +78,7 @@ def home_page():
     st.image(image2,caption = 'DL is what we will focus more')
     # Add content specific to the home page
     st.header("MACHINE LEARNING OR DEEP LEARNING PIPELINE:")
-    image3=Image.open('https://github.com/MANAS-exe/Streamlit/blob/main/manual-pipeline.png')
+    image3=Image.open('manual-pipeline.png')
     st.image(image3,caption = "This is a general pipeline")
     st.text('but we will not focus this much in depth at the level of class 5-10')
 
@@ -86,7 +86,7 @@ def home_page():
     st.write("A machine learning (ML) model is a mathematical representation or a computational system that learns patterns from data and makes predictions or decisions without being explicitly programmed for the task. In other words, a machine learning model is trained on historical data to recognize patterns and relationships, and it can then use that knowledge to make predictions or decisions on new, unseen data.")
 
     st.write("Our model typically consists of several key components designed to effectively process and classify images. Here's a theoretical overview of a simple CNN architecture for MNIST classification:")
-    image4 = Image.open('https://github.com/MANAS-exe/Streamlit/blob/main/cnn.webp')
+    image4 = Image.open('cnn.webp')
     st.image(image4)
 
     st.write('Now we will proceed towards our ML model :muscle: 	:female-technologist:')
