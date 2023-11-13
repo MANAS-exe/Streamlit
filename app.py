@@ -13,6 +13,7 @@ import torch.nn.functional as F
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
+#import time
 st.markdown(
     """
     <style>
@@ -80,6 +81,7 @@ def home_page():
     st.header("MACHINE LEARNING OR DEEP LEARNING PIPELINE:")
     image3=Image.open('manual-pipeline.png')
     st.image(image3,caption = "This is a general pipeline")
+    st.image("The-Pattern-Recognition-Pipeline-From-the-original-image-to-the-classified-result.png",caption = "Image classification pipeline")
     st.text('but we will not focus this much in depth at the level of class 5-10')
 
     st.header("But what is a MODEL ?")
@@ -92,6 +94,10 @@ def home_page():
     st.write('Now we will proceed towards our ML model :muscle: 	:female-technologist:')
     st.text('SO SIT BACK,RELAX AND ENJOY IT !	 ')
     st.write('	:tropical_drink: :tropical_drink:')
+
+    st.text('Various paramters with which you are going to play with has been explained in detail in the "Definitions" page.')
+    st.text("SO KINDLY HAVE A LOOK ON THAT WHILE VARYING IT IN THE TEST SECTION. ")
+    st.write("All the parameters have been set to default value for better training but you can change them and see the effects (that's how you will learn MACHINE LEARNING :wink::wink:) ")
 def train():
     test_size_key = "test_size_slider"
     random_state_key = "random_state_slider"
@@ -116,7 +122,8 @@ def train():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     assert(X_train.shape[0] + X_test.shape[0] == mnist.data.shape[0])
-    st.write('X_train =',  X_train.shape)
+    st.write('Training Samples -->',  X_train.shape[0])
+    st.write('Testing Samples -->', X_test.shape[0])
     #st.write('y_train =', y_train.shape)
 
     if st.button('Show example images'):
@@ -137,6 +144,8 @@ def train():
     lr = st.slider("ENTER Learning Rate", min_value=0.0, max_value=1.0, value=0.1, step=0.1, format='%0.1f',key=lr_key)
     
     dropout = st.slider("ENTER DROPOUT",min_value=0.0,max_value=1.0,value=0.2,step=0.1,format='%0.2f',key=dropout_key)
+
+    accuracy_scores = []
 
     
     class ClassifierModule(nn.Module):
@@ -159,44 +168,38 @@ def train():
             X = F.softmax(self.output(X), dim=-1)
             return X
         
-
+    #accuracy_placeholder = st.empty()
 
 # X_accumulated = np.empty_like(X_train[:0])
 # y_accumulated = np.empty_like(y_train[:0])
-    if st.toggle('SHOW ITERATIONS'):
-        for i in range(epoch):
-
-            net = NeuralNetClassifier(
-            ClassifierModule,
-            max_epochs=i,
-            lr=lr,
-            device=device,
-            )
-            
-            # st.write(network)
-
-            #network = net.fit(X_train, y_train);
-            #network = net.fit(X_train, y_train)
-            net.fit(X_train, y_train);
-
-            y_pred = net.predict(X_test)
-            acc = accuracy_score(y_test, y_pred)
-            st.write(f"EPOCH : {i+1}   ACCURACY_SCORE-->{acc : 0.3f} ")
-            return net
-        
-    else :
-        net = NeuralNetClassifier(
-        ClassifierModule,
-        max_epochs=epoch,
-        lr=lr,
-        device=device,
-        )
-        net.fit(X_train, y_train);
-
-        y_pred = net.predict(X_test)
-        acc = accuracy_score(y_test, y_pred)
     
-    st.write("ACCURACY SCORE - ", accuracy_score(y_test, y_pred))
+    
+    
+
+    net = NeuralNetClassifier(
+    ClassifierModule,
+    max_epochs=epoch,
+    lr=lr,
+    device=device,
+    )
+    
+    net.fit(X_train, y_train);
+
+    y_pred = net.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+        ##accuracy_scores.append(acc)
+
+        #accuracy_placeholder.text(f"Epoch {epoch + 1} - Accuracy: {acc:.3f}")
+    col1 , col2=st.columns(([3,1]))
+    col1.text("ACCURACY SCORE - " + str(accuracy_score(y_test, y_pred)))
+    pr = col2.progress(0)
+
+    for i in range(int(accuracy_score(y_test, y_pred))):
+        time.sleep(0.1)
+        pr.progress(i+1)
+
+   
+
     
         # Add content specific to the about page
     return net
@@ -205,71 +208,79 @@ def train():
 def test(net):
     st.title("TESTING THE DATA")
 
-    uploaded_file = st.file_uploader(label='Pick an image depicting a single digit from 0 to 9')
-    if uploaded_file is not None:
-        image_data = uploaded_file.getvalue()
-        image = Image.open(uploaded_file).convert("L").resize((28, 28))
-        image = np.array(image) / 255.0
+    if trained_model is None:
+        st.warning("Please train the model before making predictions.")
+    else:
 
-        st.image(image, caption='Processed Image', use_column_width=True)
-        
-        image = image.flatten().reshape(1, -1)
-        image_tensor = torch.FloatTensor(image).unsqueeze(0).unsqueeze(0)
+        uploaded_file = st.file_uploader(label='Pick an image depicting a single digit from 0 to 9')
+        if uploaded_file is not None:
+            image_data = uploaded_file.getvalue()
+            image = Image.open(uploaded_file).convert("L").resize((28, 28))
+            image = np.array(image) / 255.0
 
-        # Reshape the tensor to remove unnecessary dimensions
-        image_tensor = image_tensor.view(1, -1)
-
-        # Make predictions using the provided model (net)
-        prediction = net.predict(image_tensor)
-
-        # Ensure prediction is a 1D array before converting to int
-        predicted_digit = int(prediction[0] if prediction.ndim > 1 else prediction)
-        st.write("Predicted Digit:   ", predicted_digit)
-
-        ANS = st.radio('Is the Prediction Correct ?',options=['True','False'],index=None)
-        if ANS=='True':
-            st.balloons()
+            st.image(image, caption='Processed Image', use_column_width=True)
             
+            image = image.flatten().reshape(1, -1)
+            image_tensor = torch.FloatTensor(image).unsqueeze(0).unsqueeze(0)
+
+            # Reshape the tensor to remove unnecessary dimensions
+            image_tensor = image_tensor.view(1, -1)
+
+            # Make predictions using the provided model (net)
+            prediction = net.predict(image_tensor)
+
+            # Ensure prediction is a 1D array before converting to int
+            predicted_digit = int(prediction[0] if prediction.ndim > 1 else prediction)
+            st.write("Predicted Digit:   ", predicted_digit)
+
+            ANS = st.radio('Is the Prediction Correct ?',options=['True','False'],index=None)
+            if ANS=='True':
+                if st.button("Want to celebrate :partying_face: :partying_face:"):
+                    st.balloons()
             
-    if st.button('Use canvas to predict') :
-        drawing_mode = st.sidebar.selectbox(
-        "Drawing tool:", ("point", "freedraw", "line", "rect", "circle", "transform")
-        )
+                
+                
+                
+        if st.button('Use canvas to predict') :
+            drawing_mode = st.sidebar.selectbox(
+            "Drawing tool:", ("point", "freedraw", "line", "rect", "circle", "transform")
+            )
 
-        stroke_width = st.sidebar.slider("Stroke width: ", 1, 25, 3)
-        if drawing_mode == 'point':
-            point_display_radius = st.sidebar.slider("Point display radius: ", 1, 25, 3)
-        stroke_color = st.sidebar.color_picker("Stroke color hex: ")
-        bg_color = st.sidebar.color_picker("Background color hex: ", "#eee")
-        bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
+            stroke_width = st.sidebar.slider("Stroke width: ", 1, 25, 3)
+            if drawing_mode == 'point':
+                point_display_radius = st.sidebar.slider("Point display radius: ", 1, 25, 3)
+            stroke_color = st.sidebar.color_picker("Stroke color hex: ")
+            bg_color = st.sidebar.color_picker("Background color hex: ", "#eee")
+            bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
 
-        #realtime_update = st.sidebar.checkbox("Update in realtime", True)
-
-
-
-        # Create a canvas component
-        canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
-        stroke_width=stroke_width,
-        stroke_color=stroke_color,
-        background_color=bg_color,
-        background_image=Image.open(bg_image) if bg_image else None,
-        #update_streamlit=realtime_update,
-        height=150,
-        drawing_mode=drawing_mode,
-        point_display_radius=point_display_radius if drawing_mode == 'point' else 0,
-        key="canvas",
-        )
+            #realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 
-# Do something interesting with the image data and paths
-        if canvas_result.image_data is not None:
-            st.image(canvas_result.image_data)
+
+            # Create a canvas component
+            canvas_result = st_canvas(
+            fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
+            stroke_width=stroke_width,
+            stroke_color=stroke_color,
+            background_color=bg_color,
+            background_image=Image.open(bg_image) if bg_image else None,
+            #update_streamlit=realtime_update,
+            height=150,
+            drawing_mode=drawing_mode,
+            point_display_radius=point_display_radius if drawing_mode == 'point' else 0,
+            key="canvas",
+            )
+
+
+    # Do something interesting with the image data and paths
+            if canvas_result.image_data is not None:
+                st.image(canvas_result.image_data)
         
 
-
+trained_model = None
 def main():
-   
+    global trained_model
+
     st.sidebar.title("MAIN MENU")
     page_options = ["Home", "Train", "Definitions"]
     selected_page = st.sidebar.radio("Select a page", page_options)
@@ -277,9 +288,9 @@ def main():
     if selected_page == "Home":
         home_page()
     elif selected_page == "Train":
-        
-        net=train()
-        test(net)
+        st.empty()
+        trained_model = train()
+        test(trained_model)
     #elif selected_page == "Test":
     #    test()
     
@@ -288,11 +299,39 @@ def main():
         
         #st.sidebar.title("MAIN MENU")
     elif selected_page == "Definitions":
-        st.header("1.TEST SIZE :")
-        st.text("In the context of data analysis, machine learning, or statistical modeling, It typically refers to the proportion of the dataset that is used for testing the performance of a model. When you split a dataset into training and testing sets, the test size parameter determines the fraction of the data that is reserved for testing the model's performance.")
+        st.empty()
+        st.header(":rainbow[1.TEST SIZE :] ")
+        st.write("In the context of data analysis, machine learning, or statistical modeling, It typically refers to the proportion of the dataset that is used for testing the performance of a model. When you split a dataset into training and testing sets, the test size parameter determines the fraction of the data that is reserved for testing the model's performance.")
+        st.write("It ranges between 0.0 and 1.0")
+
+        st.header(":rainbow[2.RANDOM STATE :]")
+        st.write("In machinelearning, the random_state parameter is used to seed the random number generator. It's particularly relevant when there is a need for reproducibility. By setting the random_state to a specific value, you ensure that the random numbers generated during the training process are the same every time you run the code. This is crucial when you want to compare different models or rerun experiments to validate results")
+        st.write("Imagine you have a deck of cards, and you want to shuffle it. In machine learning terms, this deck represents your dataset. The order of the cards in the deck is analogous to the order of your data points")
+        st.write("If you shuffle the deck without specifying a random_state, it's like shuffling the deck without controlling the random process. Each time you shuffle, you get a different order, just as if you run your machine learning code without specifying random_state")   
+        st.write("If you set a specific random_state, it's like using a specific seed for the random number generator. It ensures that every time you shuffle with that seed, you get the same order. This is analogous to setting the random_state in machine learning to get reproducible results")
+
+        st.header(":rainbow[3.EPOCH :]")
+        st.write("In the context of machine learning, an epoch refers to one complete cycle through the entire training dataset. During an epoch, the learning algorithm processes the entire dataset, calculates the error, and updates the model's weights. The goal of training a machine learning model is to reduce the error, and this process is typically repeated over multiple epochs.")
+        c1,c2 = st.columns([2,2])
+        c1.subheader("Components of epoch")
+        c1.write("1.Forward Pass")
+        c1.write("2.Backward Pass")
+        c1.write("3.Update Parameters")
         
+        c2.image(Image.open('epoch.webp'))
 
-            
+        c3,c4=st.columns([2,2])
+        st.header(":rainbow[4.LEARNING RATE :]")
+        st.write('The learning rate is a critical hyperparameter in machine learning models')
+        st.subheader("HYPERPARAMETER ?")
+        st.write("In machine learning, hyperparameters are external configuration settings that are not learned from the data but are set prior to the training process. These parameters are essential for controlling the learning process and the overall behavior of a machine learning model. ")
 
+       # c1.write("A higher learning rate generally leads to faster convergence during training. The model may reach a solution more quickly, especially in the early epochs.")
+        st.image(Image.open('alpha.png'))
+
+        st.header("5.:rainbow[DROPOUTt :]")
+
+        st.write('Dropout is a regularization technique commonly used in neural networks during training to prevent overfitting. Overfitting occurs when a model learns not only the underlying patterns in the training data but also noise and details that are specific to that data, leading to poor performance on new, unseen data. Dropout is a simple yet effective method to improve the generalization ability of neural networks.')
+        st.image('dropout.png')
 if __name__ == '__main__':
         main()
