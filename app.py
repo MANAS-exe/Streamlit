@@ -95,7 +95,7 @@ def home_page():
     st.text('SO SIT BACK,RELAX AND ENJOY IT !	 ')
     st.write('	:tropical_drink: :tropical_drink:')
 
-    st.text('Various paramters with which you are going to play with has been explained in detail in the "Definitions" page.')
+    st.text('Various parameters with which you are going to play with has been explained in detail in the "Definitions" page.')
     st.text("SO KINDLY HAVE A LOOK ON THAT WHILE VARYING IT IN THE TEST SECTION. ")
     st.write("All the parameters have been set to default value for better training but you can change them and see the effects (that's how you will learn MACHINE LEARNING :wink::wink:) ")
 def train():
