@@ -149,28 +149,31 @@ def train():
 
     uploaded_file = st.file_uploader(label='Pick an image depicting a single digit from 0 to 9 for testing the model')
 
-    accuracy_scores = []
-
     
-    class ClassifierModule(nn.Module):
-        def __init__(
-                    self,
-                    input_dim=mnist_dim,
-                    hidden_dim=hidden_dim,
-                    output_dim=output_dim,
-                    dropout=dropout,
-            ):
-                super(ClassifierModule, self).__init__()
-                self.dropout = nn.Dropout(dropout)
 
-                self.hidden = nn.Linear(input_dim, hidden_dim)
-                self.output = nn.Linear(hidden_dim, output_dim)
+   
 
-        def forward(self, X, **kwargs):
-            X = F.relu(self.hidden(X))
-            X = self.dropout(X)
-            X = F.softmax(self.output(X), dim=-1)
-            return X
+    #uploaded_file = st.file_uploader(label='Pick an image depicting a single digit from 0 to 9')
+    if uploaded_file is not None:
+        class ClassifierModule(nn.Module):
+            def __init__(
+                        self,
+                        input_dim=mnist_dim,
+                        hidden_dim=hidden_dim,
+                        output_dim=output_dim,
+                        dropout=dropout,
+                ):
+                    super(ClassifierModule, self).__init__()
+                    self.dropout = nn.Dropout(dropout)
+
+                    self.hidden = nn.Linear(input_dim, hidden_dim)
+                    self.output = nn.Linear(hidden_dim, output_dim)
+
+            def forward(self, X, **kwargs):
+                X = F.relu(self.hidden(X))
+                X = self.dropout(X)
+                X = F.softmax(self.output(X), dim=-1)
+                return X
         
     #accuracy_placeholder = st.empty()
 
@@ -180,39 +183,27 @@ def train():
     
     
 
-    net = NeuralNetClassifier(
-    ClassifierModule,
-    max_epochs=epoch,
-    lr=lr,
-    device=device,
-    )
-    
-    net.fit(X_train, y_train);
+        net = NeuralNetClassifier(
+        ClassifierModule,
+        max_epochs=epoch,
+        lr=lr,
+        device=device,
+        )
+        
+        net.fit(X_train, y_train);
 
-    y_pred = net.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-        ##accuracy_scores.append(acc)
+        y_pred = net.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+            ##accuracy_scores.append(acc)
 
-        #accuracy_placeholder.text(f"Epoch {epoch + 1} - Accuracy: {acc:.3f}")
-    col1 , col2=st.columns(([3,1]))
-    col1.text("ACCURACY SCORE - " + str(accuracy_score(y_test, y_pred)))
-    pr = col2.progress(0)
+            #accuracy_placeholder.text(f"Epoch {epoch + 1} - Accuracy: {acc:.3f}")
+        col1 , col2=st.columns(([3,1]))
+        col1.text("ACCURACY SCORE - " + str(accuracy_score(y_test, y_pred)))
+        pr = col2.progress(0)
 
-    for i in range(int(accuracy_score(y_test, y_pred))):
-        time.sleep(0.1)
-        pr.progress(i+1)
-
-   
-
-    
-        # Add content specific to the about page
-  #  return net
-    st.title("TESTING THE DATA")
-
-   
-
-    uploaded_file = st.file_uploader(label='Pick an image depicting a single digit from 0 to 9')
-    if uploaded_file is not None:
+        for i in range(int(accuracy_score(y_test, y_pred))):
+            time.sleep(0.1)
+            pr.progress(i+1)
         image_data = uploaded_file.getvalue()
         image = Image.open(uploaded_file).convert("L").resize((28, 28))
         image = np.array(image) / 255.0
@@ -230,7 +221,7 @@ def train():
 
         # Ensure prediction is a 1D array before converting to int
         predicted_digit = int(prediction[0] if prediction.ndim > 1 else prediction)
-        st.write("Predicted Digit:   ", predicted_digit)
+        st.write(":rainbow[Predicted Digit:]   ", predicted_digit)
 
         ANS = st.radio('Is the Prediction Correct ?',options=['True','False'],index=None)
         if ANS=='True':
@@ -238,9 +229,12 @@ def train():
                 st.balloons()
 
         if ANS == 'False':
-            st.write('THEN WE SHOULD RETRAIN IT')
+            st.text('THEN WE SHOULD RETRAIN IT')
 
             st.write('If you do not want to retrain it just open the app again and upload the photo again.')
+            st.write("This is slightly heavy model in terms of parameters so please try to keep the number of epochs relatively less.")
+
+            st.write("These are the shapes of input datas and datas after splitting into test and train data.")
             XCnn = X.reshape(-1, 1, 28, 28)
 
             XCnn.shape
@@ -249,9 +243,9 @@ def train():
 
             XCnn_train.shape, y_train.shape
             epoch2_key = "epoch2_slider"
+            lr2_key ="lr2_slider"
             epoch2 = st.number_input("ENTER EPOCH", min_value=1, step=1, value=5,key = epoch2_key)
-
-
+            lr2 = st.slider("ENTER Learning Rate", min_value=0.000, max_value=0.010, value=0.002, step=0.001, format='%0.3f',key=lr2_key)
             class Cnn(nn.Module):
                 def __init__(self, dropout=0.5):
                     super(Cnn, self).__init__()
@@ -278,7 +272,7 @@ def train():
             cnn = NeuralNetClassifier(
                 Cnn,
                 max_epochs=epoch2,
-                lr=0.002,
+                lr=lr2,
                 optimizer=torch.optim.Adam,
                 device=device,
             )
@@ -297,7 +291,7 @@ def train():
 
             # Ensure prediction is a 1D array before converting to int
             predicted_digit = int(prediction[0] if prediction.ndim > 1 else prediction)
-            st.write("Predicted Digit:   ", predicted_digit)
+            st.write(":rainbow[Predicted Digit: ]  ", predicted_digit)
 
 
 
@@ -308,7 +302,7 @@ def train():
        
         
 
-#trained_model = None
+trained_model = None
 def main():
     global trained_model
 
