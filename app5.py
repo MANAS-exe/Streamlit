@@ -316,9 +316,9 @@ def main():
     page_options = ["HOME", "YOUR MODEL!", "DEFINITIONS"]
     selected_page = st.sidebar.radio("Select a page", page_options)
 
-    if selected_page == "Home":
+    if selected_page == "HOME":
         home_page()
-    elif selected_page == "Train":
+    elif selected_page == "YOUR MODEL!":
         st.empty()
         train()
         #test(trained_model)
@@ -329,7 +329,7 @@ def main():
                
         
         #st.sidebar.title("MAIN MENU")
-    elif selected_page == "Definitions":
+    elif selected_page == "DEFINITIONS":
         st.empty()
         st.header(":rainbow[1.TEST SIZE :] ")
         st.write("In the context of data analysis, machine learning, or statistical modeling, It typically refers to the proportion of the dataset that is used for testing the performance of a model. When you split a dataset into training and testing sets, the test size parameter determines the fraction of the data that is reserved for testing the model's performance.")
