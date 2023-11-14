@@ -329,7 +329,7 @@ def main():
        # c1.write("A higher learning rate generally leads to faster convergence during training. The model may reach a solution more quickly, especially in the early epochs.")
         st.image(Image.open('alpha.png'))
 
-        st.header("5.:rainbow[DROPOUT :]")
+        st.header(":rainbow[5.DROPOUT :]")
 
         st.write('Dropout is a regularization technique commonly used in neural networks during training to prevent overfitting. Overfitting occurs when a model learns not only the underlying patterns in the training data but also noise and details that are specific to that data, leading to poor performance on new, unseen data. Dropout is a simple yet effective method to improve the generalization ability of neural networks.')
         st.image('dropout.png')
