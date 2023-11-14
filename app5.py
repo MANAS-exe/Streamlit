@@ -231,7 +231,7 @@ def train():
         if ANS == 'False':
             st.text('THEN WE SHOULD RETRAIN IT')
 
-            st.write('If you do not want to retrain it just open the app again and upload the photo again.')
+            st.write('If you do not want to retrain it you are requested to just open the app again and upload the photo again.')
             st.write("This is slightly heavy model in terms of parameters so please try to keep the number of epochs relatively less.")
 
             st.write("These are the shapes of input datas and datas after splitting into test and train data.")
