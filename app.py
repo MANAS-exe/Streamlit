@@ -282,7 +282,7 @@ def main():
     global trained_model
 
     st.sidebar.title("MAIN MENU")
-    page_options = ["Home", "Train", "Definitions"]
+    page_options = ["HOME", "YOUR MODEL!", "DEFINITIONS"]
     selected_page = st.sidebar.radio("Select a page", page_options)
 
     if selected_page == "Home":
